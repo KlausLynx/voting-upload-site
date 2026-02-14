@@ -113,7 +113,11 @@ useEffect(() => {
       const serverUrl = await SERVER_CONFIG.getServerUrl();
       console.log('Fetching from:', serverUrl);
       
-      const response = await fetch(`${serverUrl}/get-centers`);
+      const response = await fetch(`${serverUrl}/get-centers`, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
       const data = await response.json();
       
       setCenters(data);
@@ -442,13 +446,14 @@ function UploadForm({centerData, onSubmit}) {
     const serverUrl = await SERVER_CONFIG.getServerUrl();
     
     // Send to server
-    const response = await fetch(`${serverUrl}/submit-vote`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(voteData)
-    });
+   const response = await fetch(`${serverUrl}/submit-vote`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true'
+  },
+  body: JSON.stringify(voteData)
+});
 
     const result = await response.json();
 
