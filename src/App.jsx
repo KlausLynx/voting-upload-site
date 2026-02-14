@@ -107,22 +107,26 @@ function RegistrationPage({ onComplete }) {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Auto-detect server and fetch centers
-    SERVER_CONFIG.getServerUrl().then(serverUrl => {
-      fetch(`${serverUrl}/get-centers`)
-        .then(response => response.json())
-        .then(data => {
-          setCenters(data);
-          setLoading(false);
-        })
-        .catch(error => {
-          console.error('Error fetching centers:', error);
-          alert('Could not load centers. Please check server connection.');
-          setLoading(false);
-        });
-    });
-  }, []);
+useEffect(() => {
+  const fetchCenters = async () => {
+    try {
+      const serverUrl = await SERVER_CONFIG.getServerUrl();
+      console.log('Fetching from:', serverUrl);
+      
+      const response = await fetch(`${serverUrl}/get-centers`);
+      const data = await response.json();
+      
+      setCenters(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching centers:', error);
+      alert('Could not load centers from server');
+      setLoading(false);
+    }
+  };
+  
+  fetchCenters();
+}, []);
 
   const handleSubmit = async (e) => {
   e.preventDefault();
