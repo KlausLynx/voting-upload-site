@@ -1,5 +1,5 @@
 export const SERVER_CONFIG = {
-  LOCAL: 'http://192.168.0.2:3000',
+  LOCAL: 'http://192.168.0.3:3000',
   PUBLIC: 'https://wholemeal-noncoercively-seymour.ngrok-free.dev',
   
   getServerUrl: async () => {

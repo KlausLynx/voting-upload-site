@@ -2,6 +2,7 @@ import {useState, useEffect} from 'react';
 import './index.css'
 import {useForm} from 'react-hook-form';
 import { SERVER_CONFIG } from './config';
+import AuthGate from './AuthGate';
 
 function LockedScreen({ centerData, submissionData }) {
    return (
@@ -574,11 +575,12 @@ function App() {
   const [submissionData, setSubmissionData] = useState(null);
 
   return (
+  <AuthGate>
     <div className='app'>
       {currentPage === 'registration' && (
-        <RegistrationPage onComplete={(data)=> {
+        <RegistrationPage onComplete={(data) => {
           setCenterData(data);
-          setCurrentPage('upload')
+          setCurrentPage('upload');
         }} />
       )}
 
@@ -592,7 +594,6 @@ function App() {
         />
       )}
 
-    <div>
       {currentPage === 'locked' && (
         <LockedScreen 
           centerData={centerData}
@@ -600,8 +601,8 @@ function App() {
         />
       )}
     </div>
-  </div>
-  )
+  </AuthGate>
+);
 }
 
 export default App;
