@@ -133,7 +133,7 @@ useEffect(() => {
   fetchCenters();
 }, []);
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
   
   // Validate center selected
@@ -148,22 +148,45 @@ useEffect(() => {
     return;
   }
   
-  // Step 1: Setup biometric
-  const biometricSetup = await setupBiometric();
+  // Check if we're in a secure context (HTTPS or localhost)
+  const isSecureContext = window.isSecureContext;
+  let biometricData = null;
   
-  if (!biometricSetup) {
-    alert('Biometric setup failed. Please try again.');
-    return;
+  if (isSecureContext) {
+    // Online mode - require biometric
+    biometricData = await setupBiometric();
+    
+    if (!biometricData) {
+      alert('Biometric setup failed. Please try again.');
+      return;
+    }
+  } else {
+    // Offline mode - ask if they want to skip biometric
+    const skipBiometric = confirm(
+      '⚠️ Biometric authentication is not available on this network.\n\n' +
+      'This usually happens when accessing via local IP address.\n\n' +
+      'Do you want to continue WITHOUT biometric authentication?\n\n' +
+      '(Only for offline/local network use)'
+    );
+    
+    if (!skipBiometric) {
+      alert('Registration cancelled. Biometric authentication is required.');
+      return;
+    }
+    
+    // User confirmed to skip biometric
+    console.log('⚠️ Skipping biometric for offline mode');
   }
   
-  // Step 2: Combine all data
+  // Combine all data
   const completeData = {
     centerCode: selectedCenter.code,
     centerName: selectedCenter.name,
     centerLocation: selectedCenter.location,
     ...formData,
-    biometricCredential: biometricSetup.credential,
-    biometricId: biometricSetup.credentialId
+    biometricCredential: biometricData?.credential || null,
+    biometricId: biometricData?.credentialId || 'offline-skip',
+    biometricVerified: !!biometricData
   };
   
   // Pass to parent
